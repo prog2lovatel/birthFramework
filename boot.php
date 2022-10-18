@@ -1,0 +1,5 @@
+<?php
+require 'routes.php';
+
+
+?>
