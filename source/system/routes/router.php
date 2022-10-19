@@ -9,20 +9,27 @@ class Router
 {
     public function __construct()
     {
+
     }
 
     public function get($url, $controller = [])
     {
         if ($_SERVER['REQUEST_METHOD'] != 'GET')
             return;
-        /*if ($url != $_SERVER['REQUEST_URI'])
-            return;*/
-        if (!isset($controller) || empty($controller))
+
+        $pattern =  $this->replaceParamns($url); 
+
+        if(! preg_match('#^'.$pattern.'$#', $_SERVER['REQUEST_URI']))
             return;
+             
 
-        $this->validateRoute($url);
+        $paramns = $this->findParamns($url, $pattern);        
+        $values = $this->findValues($url, $pattern);
 
-        $this->loadController($controller[0], $controller[1]);
+        print_r($paramns);        
+        print_r($values);
+
+        //$this->loadController($controller[0], $controller[1], $paramns);
     }
 
     public function post()
@@ -30,18 +37,11 @@ class Router
         if ($_SERVER['REQUEST_METHOD'] != 'POST')
             return;
     }
-
-    private function validateRoute($url)
-    {
-        echo preg_replace("#{.*}#", "", $url);        
-        
-        if ($url != $_SERVER['REQUEST_URI'])
-            return;
-        
-    }
+    
     private function loadController($controllerName, $controllerMethod)
     {
         $reflection = new ReflectionClass($controllerName);
+
         $instance = $reflection->newInstance();
 
         if (!$reflection->hasMethod($controllerMethod)) {
@@ -51,4 +51,32 @@ class Router
         $method = $reflection->getMethod($controllerMethod);
         $method->invoke($instance);
     }
+
+    private function validateRoute($pattern)
+    {   
+        return preg_match('#^'.$pattern.'$#', $_SERVER['REQUEST_URI']);      
+    }
+
+    private function findParamns($url)
+    {
+        preg_match_all("#{([A-Za-z0-9-]+)}#", $url, $matches);
+
+        return $matches[1];
+    }
+
+    private function findValues($pattern){
+
+        echo $pattern . '<br>';
+
+        preg_match_all('#^'.$pattern.'$#', $_SERVER['REQUEST_URI'], $matches);
+
+        return $matches;
+    }
+
+    private function replaceParamns($url)
+    {
+        return preg_replace("#{([A-Za-z0-9]+)}#", "([A-Za-z0-9-]+)", $url);
+    }
+
+
 }
