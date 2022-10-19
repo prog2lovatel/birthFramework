@@ -7,29 +7,28 @@ use ReflectionClass;
 
 class Router
 {
-    public function __construct()
-    {
-
-    }
+    private $url;
 
     public function get($url, $controller = [])
     {
+        $this->url = $url;
+
+        ### Verificar se é o Método GET ###
         if ($_SERVER['REQUEST_METHOD'] != 'GET')
             return;
 
-        $pattern =  $this->replaceParamns($url); 
+        ### Construir Padrão de Comparação ###
+        $pattern = $this->buildUrlCheckPattern();
 
-        if(! preg_match('#^'.$pattern.'$#', $_SERVER['REQUEST_URI']))
+        ### Testar o padrão com a request URI ###
+        if (!preg_match($pattern, $_SERVER['REQUEST_URI'], $matches))
             return;
-             
 
-        $paramns = $this->findParamns($url, $pattern);        
-        $values = $this->findValues($url, $pattern);
+        ### Extrair os parametros ###
+        $paramns = $this->getParamns($matches);
 
-        print_r($paramns);        
-        print_r($values);
-
-        //$this->loadController($controller[0], $controller[1], $paramns);
+        ### Invocar o Controlador
+        $this->invokeController($controller[0], $controller[1], $paramns);
     }
 
     public function post()
@@ -37,8 +36,37 @@ class Router
         if ($_SERVER['REQUEST_METHOD'] != 'POST')
             return;
     }
-    
-    private function loadController($controllerName, $controllerMethod)
+
+    private function buildUrlCheckPattern()
+    {
+        return '#^' . preg_replace("#{([A-Za-z0-9]+)}#", "([A-Za-z0-9-]+)", $this->url) . '$#';
+    }
+
+    private function findLabels()
+    {
+        preg_match_all("#{([A-Za-z0-9-]+)}#", $this->url, $matches);
+
+        return $matches[1];
+    }
+
+    private function getParamns($matches)
+    {
+        $paramns = [];
+
+        $labels = $this->findLabels();
+
+        if ($labels != null) {
+
+            foreach ($labels as $i => $label) {
+
+                $paramns[$label] = $matches[$i + 1];
+            }
+        }
+
+        return $paramns;
+    }
+
+    private function invokeController($controllerName, $controllerMethod, $paramns)
     {
         $reflection = new ReflectionClass($controllerName);
 
@@ -51,32 +79,4 @@ class Router
         $method = $reflection->getMethod($controllerMethod);
         $method->invoke($instance);
     }
-
-    private function validateRoute($pattern)
-    {   
-        return preg_match('#^'.$pattern.'$#', $_SERVER['REQUEST_URI']);      
-    }
-
-    private function findParamns($url)
-    {
-        preg_match_all("#{([A-Za-z0-9-]+)}#", $url, $matches);
-
-        return $matches[1];
-    }
-
-    private function findValues($pattern){
-
-        echo $pattern . '<br>';
-
-        preg_match_all('#^'.$pattern.'$#', $_SERVER['REQUEST_URI'], $matches);
-
-        return $matches;
-    }
-
-    private function replaceParamns($url)
-    {
-        return preg_replace("#{([A-Za-z0-9]+)}#", "([A-Za-z0-9-]+)", $url);
-    }
-
-
 }
