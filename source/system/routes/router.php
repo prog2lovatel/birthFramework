@@ -31,10 +31,26 @@ class Router
         $this->invokeController($controller[0], $controller[1], $paramns);
     }
 
-    public function post()
+    public function post($url, $controller = [])
     {
+        $this->url = $url;
+
+        ### Verificar se é o Método POST ###
         if ($_SERVER['REQUEST_METHOD'] != 'POST')
             return;
+
+        ### Construir Padrão de Comparação ###
+        $pattern = $this->buildUrlCheckPattern();
+
+        ### Testar o padrão com a request URI ###
+        if (!preg_match($pattern, $_SERVER['REQUEST_URI'], $matches))
+            return;
+
+        ### Extrair os parametros ###
+        $paramns = $this->getParamns($matches);
+
+        ### Invocar o Controlador
+        $this->invokeController($controller[0], $controller[1], $paramns);
     }
 
     private function buildUrlCheckPattern()
