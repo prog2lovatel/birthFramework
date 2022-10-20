@@ -1,22 +1,24 @@
 <?php
 
-namespace Adm\FirstFramework\controllers;
+namespace Source\controllers;
+
+use BirthFramework\response\HtmlResponse;
+use BirthFramework\response\JsonResponse;
 
 class Banners
 {
-    public function __construct()
-    {
-    }
     public function index()
     {
         echo 'Teste';
     }
+
     public function create()
     {
-        echo 'Teste';
+        return new HtmlResponse("<h1>Página de Criação de Banners</h1>");
     }
-    public function edit($id)
-    {
-        echo $id;
+
+    public function edit(int $id)
+    {          
+        return new JsonResponse(['id' => $id, 'titulo' => "Willian"], 201);
     }
 }
