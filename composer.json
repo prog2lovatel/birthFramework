@@ -13,6 +13,10 @@
         {
             "name": "Nacimento",
             "email": "programacao4@lovatel.com.br"
+        },
+        {
+            "name": "Willian Stori",
+            "email" : "programacao2@lovatel.com.br"
         }
     ],
     "require": {}

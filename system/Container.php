@@ -35,7 +35,7 @@ class Container
             $response->send();
         }
 
-        exit();
+        exit;
     }
 
     private function createReflactionClass(): ReflectionClass

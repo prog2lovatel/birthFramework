@@ -2,7 +2,7 @@
 
 namespace BirthFramework\routes;
 
-use Adm\FirstFramework\controllers\error\Error;
+use Source\controllers\error\Error;
 use BirthFramework\Container;
 
 class Router
@@ -100,7 +100,7 @@ class Router
             return;
 
         ### Extrair os parametros ###
-        $paramns = $this->getParamns($matches);
+        $paramns = $this->getParamns($matches);        
 
         ### Cria um container para execução da Requisição ###
         $container = new Container($controller[Router::CONTROLLER_NAME], $controller[Router::CONTROLLER_METHOD], $paramns);
@@ -117,12 +117,18 @@ class Router
 
     private function buildUrlCheckPattern()
     {
-        return '#^' . preg_replace("#{([A-Za-z0-9]+)}#", "([A-Za-z0-9-]+)", $this->url) . '$#';
+        $patterns[0] = "#{([A-Za-z0-9]+)}#";
+        $patterns[1] = "#{([A-Za-z0-9]+:any)}#";
+
+        $replacements[0] = "([0-9]+)";
+        $replacements[1] = "([A-Za-z0-9-]+)";
+
+        return '#^' . preg_replace($patterns, $replacements, $this->url) . '$#';
     }
 
     private function findLabels()
     {
-        preg_match_all("#{([A-Za-z0-9-]+)}#", $this->url, $matches);
+        preg_match_all("#{([A-Za-z0-9:]+)}#", $this->url, $matches);
 
         return $matches[1];
     }
@@ -136,6 +142,8 @@ class Router
         if ($labels != null) {
 
             foreach ($labels as $i => $label) {
+
+                $label = preg_replace("#:any#", "", $label);
 
                 $paramns[$label] = $matches[$i + 1];
             }
