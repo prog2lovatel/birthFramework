@@ -1,12 +1,15 @@
 <?php
 
-use Source\controllers\Banners;
+use Source\controllers\BannerController;
+use Source\controllers\HomeController;
 
-/* Routes de Banners */
-$router->get('/banner', [Banners::class, "index"]);
-$router->get('/banner/criar', [Banners::class, "create"]);
-$router->get('/banner/{id}', [Banners::class, "edit"]);
-$router->get('/banner/{id}/{titulo:any}', [Banners::class, "show"]);
-$router->get('/banner/store', [Banners::class, "store"]);
+/* Neste arquivo são configuradas as rotas da sua aplicação */
+
+$router->get('/', [HomeController::class, "index"]);
+$router->get('/banner', [BannerController::class, "index"]);
+$router->get('/banner/criar', [BannerController::class, "create"]);
+$router->get('/banner/{id}', [BannerController::class, "edit"]);
+$router->get('/banner/{id}/{titulo:any}', [BannerController::class, "show"]);
+$router->get('/banner/store', [BannerController::class, "store"]);
 
 $router->notFound();

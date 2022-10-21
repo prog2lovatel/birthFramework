@@ -15,9 +15,6 @@ $container = $router->exec();
 
 $response = $container->exec();
 
-if ($response != null) {
-
-    $response->send();
-}
+$response->send();
 
 exit();

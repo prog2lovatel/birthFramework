@@ -2,6 +2,7 @@
 
 namespace BirthFramework;
 
+use BirthFramework\response\Response;
 use ReflectionClass;
 use ReflectionMethod;
 
@@ -18,15 +19,15 @@ class Container
         $this->paramns = $paramns;
     }
 
-    public function exec()
+    public function exec(): Response
     {
         $reflaction = $this->createReflactionClass();
 
-        $instance = $reflaction->newInstance();
+        $instance = $this->createInstance($reflaction);
 
         $reflactionMethod = $this->getReflactionMethod($reflaction);
 
-        $args = $this->getReflectionMethodArgs($reflactionMethod);
+        $args = $this->getReflectionArgs($reflactionMethod);
 
         return $reflactionMethod->invokeArgs($instance, $args);
         
@@ -37,10 +38,21 @@ class Container
         try {
 
             return new ReflectionClass($this->controller);
+
         } catch (\Throwable $e) {
 
             throw new \InvalidArgumentException("O controlador " . $this->controller . " não existe.");
         }
+    }
+
+    private function createInstance(ReflectionClass $reflection)
+    {
+        if(!$reflection->isInstantiable())
+        {
+            throw new \ReflectionException ."O controlador ". $this->controller . " não pode ser instanciado.";
+        }
+
+        return $reflection->newInstance();
     }
 
     private function getReflactionMethod($reflection): ReflectionMethod
@@ -53,7 +65,7 @@ class Container
         return $reflection->getMethod($this->method);
     }
 
-    private function getReflectionMethodArgs($reflectionMethod): array
+    private function getReflectionArgs($reflectionMethod): array
     {
         $parameters = $reflectionMethod->getParameters();
 

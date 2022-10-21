@@ -13,6 +13,7 @@ class Router implements Singleton
 
     public static $instance;
 
+    private $uri;
     private $url;
     private $controller;
     private $method;
@@ -23,118 +24,105 @@ class Router implements Singleton
         //
     }
 
-    public static function getInstance()
+    public static function getInstance(): Router
     {
         if (!isset(self::$instance)) {
             self::$instance = new Router();
             self::$instance->controller = "";
             self::$instance->method = "";
             self::$instance->paramns = [];
+            self::$instance->uri = !isset($_SERVER['QUERY_STRING'])
+                ? $_SERVER['REQUEST_URI'] :
+                str_replace('?' . $_SERVER['QUERY_STRING'], '', $_SERVER['REQUEST_URI']);
         }
 
         return self::$instance;
     }
 
-    public function get($url, $controller = [])
+    public function get(string $url, array $controller = []): void
     {
         $this->url = $url;
 
-        ### Verificar se é o Método GET ###
         if ($_SERVER['REQUEST_METHOD'] != 'GET')
             return;
 
-        ### Construir Padrão de Comparação ###
         $pattern = $this->buildUrlCheckPattern();
 
-        ### Testar o padrão com a request URI ###
-        if (!preg_match($pattern, $_SERVER['PATH_INFO'], $matches))
+        if (!preg_match($pattern, $this->uri, $matches))
             return;
 
-        ### Extrair os parametros ###
         $this->controller = $controller[Router::CONTROLLER_NAME];
         $this->method = $controller[Router::CONTROLLER_METHOD];
-        $this->paramns = $this->getParamns($matches);        
+        $this->paramns = $this->getParamns($matches);
     }
 
-    public function post($url, $controller = [])
+    public function post(string $url, array $controller = []): void
     {
         $this->url = $url;
 
-        ### Verificar se é o Método POST ###
         if ($_SERVER['REQUEST_METHOD'] != 'POST')
             return;
 
-        ### Construir Padrão de Comparação ###
         $pattern = $this->buildUrlCheckPattern();
 
-        ### Testar o padrão com a request URI ###
-        if (!preg_match($pattern, $_SERVER['PATH_INFO'], $matches))
+        if (!preg_match($pattern, $this->uri, $matches))
             return;
 
-        ### Extrair os parametros ###
         $this->controller = $controller[Router::CONTROLLER_NAME];
         $this->method = $controller[Router::CONTROLLER_METHOD];
-        $this->paramns = $this->getParamns($matches);   
+        $this->paramns = $this->getParamns($matches);
     }
 
-    public function put($url, $controller = [])
+    public function put(string $url, array $controller = []): void
     {
         $this->url = $url;
 
-        ### Verificar se é o Método PUT ###
         if ($_SERVER['REQUEST_METHOD'] != 'PUT')
             return;
 
-        ### Construir Padrão de Comparação ###
         $pattern = $this->buildUrlCheckPattern();
 
-        ### Testar o padrão com a request URI ###
-        if (!preg_match($pattern, $_SERVER['PATH_INFO'], $matches))
+        if (!preg_match($pattern, $this->uri, $matches))
             return;
 
-        ### Extrair os parametros ###
         $this->controller = $controller[Router::CONTROLLER_NAME];
         $this->method = $controller[Router::CONTROLLER_METHOD];
-        $this->paramns = $this->getParamns($matches);   
+        $this->paramns = $this->getParamns($matches);
     }
 
-    public function delete($url, $controller = [])
+    public function delete(string $url, array $controller = []): void
     {
         $this->url = $url;
 
-        ### Verificar se é o Método DELETE ###
         if ($_SERVER['REQUEST_METHOD'] != 'DELETE')
             return;
 
-        ### Construir Padrão de Comparação ###
         $pattern = $this->buildUrlCheckPattern();
 
-        ### Testar o padrão com a request URI ###
-        if (!preg_match($pattern, $_SERVER['PATH_INFO'], $matches))
+        if (!preg_match($pattern, $this->uri, $matches))
             return;
 
-        ### Extrair os parametros ###
         $this->controller = $controller[Router::CONTROLLER_NAME];
         $this->method = $controller[Router::CONTROLLER_METHOD];
-        $this->paramns = $this->getParamns($matches);   
+        $this->paramns = $this->getParamns($matches);
     }
 
-    public function notFound()
+    public function notFound(): void
     {
-        if(!empty($this->controller)){
+        if (!empty($this->controller)) {
             return;
         }
-        
+
         $this->controller = Error::class;
         $this->method = "notFound";
     }
 
-    public function exec() : Container
+    public function exec(): Container
     {
         return new Container($this->controller, $this->method, $this->paramns);
     }
 
-    private function buildUrlCheckPattern()
+    private function buildUrlCheckPattern(): string
     {
         $patterns[0] = "#{([A-Za-z0-9]+)}#";
         $patterns[1] = "#{([A-Za-z0-9]+:any)}#";
@@ -145,14 +133,14 @@ class Router implements Singleton
         return '#^' . preg_replace($patterns, $replacements, $this->url) . '$#';
     }
 
-    private function findLabels()
+    private function findLabels(): array
     {
         preg_match_all("#{([A-Za-z0-9:]+)}#", $this->url, $matches);
 
         return $matches[1];
     }
 
-    private function getParamns($matches)
+    private function getParamns(array $matches): array
     {
         $paramns = [];
 
