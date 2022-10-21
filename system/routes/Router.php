@@ -4,13 +4,36 @@ namespace BirthFramework\routes;
 
 use Source\controllers\error\Error;
 use BirthFramework\Container;
+use BirthFramework\Singleton;
 
-class Router
+class Router implements Singleton
 {
     private const CONTROLLER_NAME = 0;
     private const CONTROLLER_METHOD = 1;
 
+    public static $instance;
+
     private $url;
+    private $controller;
+    private $method;
+    private $paramns;
+
+    private function __construct()
+    {
+        //
+    }
+
+    public static function getInstance()
+    {
+        if (!isset(self::$instance)) {
+            self::$instance = new Router();
+            self::$instance->controller = "";
+            self::$instance->method = "";
+            self::$instance->paramns = [];
+        }
+
+        return self::$instance;
+    }
 
     public function get($url, $controller = [])
     {
@@ -24,16 +47,13 @@ class Router
         $pattern = $this->buildUrlCheckPattern();
 
         ### Testar o padrão com a request URI ###
-        if (!preg_match($pattern, $_SERVER['REQUEST_URI'], $matches))
+        if (!preg_match($pattern, $_SERVER['PATH_INFO'], $matches))
             return;
 
         ### Extrair os parametros ###
-        $paramns = $this->getParamns($matches);
-
-        ### Cria um container para execução da Requisição ###
-        $container = new Container($controller[Router::CONTROLLER_NAME], $controller[Router::CONTROLLER_METHOD], $paramns);
-
-        $container->exec();
+        $this->controller = $controller[Router::CONTROLLER_NAME];
+        $this->method = $controller[Router::CONTROLLER_METHOD];
+        $this->paramns = $this->getParamns($matches);        
     }
 
     public function post($url, $controller = [])
@@ -48,16 +68,13 @@ class Router
         $pattern = $this->buildUrlCheckPattern();
 
         ### Testar o padrão com a request URI ###
-        if (!preg_match($pattern, $_SERVER['REQUEST_URI'], $matches))
+        if (!preg_match($pattern, $_SERVER['PATH_INFO'], $matches))
             return;
 
         ### Extrair os parametros ###
-        $paramns = $this->getParamns($matches);
-
-        ### Cria um container para execução da Requisição ###
-        $container = new Container($controller[Router::CONTROLLER_NAME], $controller[Router::CONTROLLER_METHOD], $paramns);
-
-        $container->exec();
+        $this->controller = $controller[Router::CONTROLLER_NAME];
+        $this->method = $controller[Router::CONTROLLER_METHOD];
+        $this->paramns = $this->getParamns($matches);   
     }
 
     public function put($url, $controller = [])
@@ -72,16 +89,13 @@ class Router
         $pattern = $this->buildUrlCheckPattern();
 
         ### Testar o padrão com a request URI ###
-        if (!preg_match($pattern, $_SERVER['REQUEST_URI'], $matches))
+        if (!preg_match($pattern, $_SERVER['PATH_INFO'], $matches))
             return;
 
         ### Extrair os parametros ###
-        $paramns = $this->getParamns($matches);
-
-        ### Cria um container para execução da Requisição ###
-        $container = new Container($controller[Router::CONTROLLER_NAME], $controller[Router::CONTROLLER_METHOD], $paramns);
-
-        $container->exec();
+        $this->controller = $controller[Router::CONTROLLER_NAME];
+        $this->method = $controller[Router::CONTROLLER_METHOD];
+        $this->paramns = $this->getParamns($matches);   
     }
 
     public function delete($url, $controller = [])
@@ -96,23 +110,28 @@ class Router
         $pattern = $this->buildUrlCheckPattern();
 
         ### Testar o padrão com a request URI ###
-        if (!preg_match($pattern, $_SERVER['REQUEST_URI'], $matches))
+        if (!preg_match($pattern, $_SERVER['PATH_INFO'], $matches))
             return;
 
         ### Extrair os parametros ###
-        $paramns = $this->getParamns($matches);        
-
-        ### Cria um container para execução da Requisição ###
-        $container = new Container($controller[Router::CONTROLLER_NAME], $controller[Router::CONTROLLER_METHOD], $paramns);
-
-        $container->exec();
+        $this->controller = $controller[Router::CONTROLLER_NAME];
+        $this->method = $controller[Router::CONTROLLER_METHOD];
+        $this->paramns = $this->getParamns($matches);   
     }
 
     public function notFound()
     {
-        $container = new Container(Error::class, "notFound");
+        if(!empty($this->controller)){
+            return;
+        }
         
-        $container->exec();
+        $this->controller = Error::class;
+        $this->method = "notFound";
+    }
+
+    public function exec() : Container
+    {
+        return new Container($this->controller, $this->method, $this->paramns);
     }
 
     private function buildUrlCheckPattern()
@@ -151,5 +170,4 @@ class Router
 
         return $paramns;
     }
-    
 }

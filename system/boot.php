@@ -1,4 +1,23 @@
 <?php
+
+use BirthFramework\Request;
+use BirthFramework\routes\Router;
+
 include __DIR__ . '/../config.php';
-include __DIR__ . '/view.php';
+
+$request = Request::getInstance();
+
+$router = Router::getInstance();
+
 include __DIR__ . '/../routes.php';
+
+$container = $router->exec();
+
+$response = $container->exec();
+
+if ($response != null) {
+
+    $response->send();
+}
+
+exit();

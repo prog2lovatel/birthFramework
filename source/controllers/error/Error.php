@@ -1,10 +1,12 @@
 <?php 
 namespace Source\controllers\error;
 
+use BirthFramework\View;
+
 class Error
 {
     function notFound(){
         
-        return view('errors/notFound.php', ['mensagem' => "Página não encontrada."], 404);
+        return View::render('errors/notFound.php', ['mensagem' => "Página não encontrada."], 404);
     }
 }

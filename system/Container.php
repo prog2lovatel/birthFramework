@@ -28,14 +28,8 @@ class Container
 
         $args = $this->getReflectionMethodArgs($reflactionMethod);
 
-        $response = $reflactionMethod->invokeArgs($instance, $args);
-
-        if ($response != null) {
-
-            $response->send();
-        }
-
-        exit;
+        return $reflactionMethod->invokeArgs($instance, $args);
+        
     }
 
     private function createReflactionClass(): ReflectionClass
