@@ -1,4 +1,4 @@
 <?php
-include './config.php';
-include 'view.php';
-include './routes.php';
+include __DIR__ . '/../config.php';
+include __DIR__ . '/view.php';
+include __DIR__ . '/../routes.php';
