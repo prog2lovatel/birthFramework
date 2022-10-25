@@ -74,7 +74,5 @@ class ArticleController extends Controller
 
         return new RedirectResponse(APP_URL . 'articles');
     }
-    
-
    
 }
