@@ -41,7 +41,7 @@ class Container
 
         } catch (\Throwable $e) {
 
-            throw new \InvalidArgumentException("O controlador " . $this->controller . " não existe.");
+            throw new \InvalidArgumentException("O controlador " . $this->controller . " não existe.", 1);
         }
     }
 
@@ -49,7 +49,7 @@ class Container
     {
         if(!$reflection->isInstantiable())
         {
-            throw new \ReflectionException ."O controlador ". $this->controller . " não pode ser instanciado.";
+            throw new \ReflectionException("O controlador ". $this->controller . " não pode ser instanciado.", 1);
         }
 
         return $reflection->newInstance();

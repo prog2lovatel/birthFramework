@@ -10,7 +10,7 @@ class View
     {
         if (!file_exists(APP_PATH . "/source/views/" . $path)) {
 
-            throw new \InvalidArgumentException("Não foi possível encontrar a view: " . $path);
+            throw new \InvalidArgumentException("Não foi possível encontrar a view: " . $path, 1);
         }
 
         ob_start();
@@ -20,7 +20,7 @@ class View
             extract($data);
         } catch (\Throwable $th) {
 
-            throw new \InvalidArgumentException("A variável data deve ser um array.");
+            throw new \InvalidArgumentException("A variável data deve ser um array.", 1);
         }
 
         include APP_PATH . "/source/views/" . $path;

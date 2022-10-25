@@ -9,5 +9,9 @@
 <body>
     <h1>Bem vindo ao Birth Framework!</h1>
     <p>Desenvolva sua aplicação e seja feliz.</p>
+
+    <ul>
+        <li><a href="articles">CRUD de Exemplo</a></li>
+    </ul>
 </body>
 </html>

@@ -19,5 +19,8 @@
             "email" : "programacao2@lovatel.com.br"
         }
     ],
-    "require": {}
+    "require": {
+        "doctrine/orm": "*",
+        "symfony/cache": "^6.1"
+    }
 }
