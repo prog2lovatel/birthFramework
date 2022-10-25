@@ -303,7 +303,7 @@ class ArticleRepository extends Repository
 }
 ```
 
-Existe uma classe abstrata chamada **Repository** que possuí a finalidade de auxiliar as suas classes de repositórios. Nesta classe  é disponilibilizada a propriedade **$this->entityManager** que é responsável por gerenciar as entidades do bando de dados. Sendo assim, dentro de suas classes de repositório você fica livre para implementar a regra de persistência dos dados da melhor forma possível.
+Existe uma classe abstrata chamada **Repository** que possuí a finalidade de auxiliar as suas classes de repositórios. Nesta classe  é disponilibilizada a propriedade **$this->entityManager** que é responsável por gerenciar as entidades do banco de dados. Sendo assim, dentro de suas classes de repositório você fica livre para implementar a regra de persistência dos dados da melhor forma possível.
 
 ## Melhorias
 
